@@ -271,6 +271,23 @@ impl Quaternion {
         }
     }
 
+    /// Kvaternion normasi: ||q|| = sqrt(w^2 + x^2 + y^2 + z^2)
+    pub fn norm(&self) -> f32 {
+        (self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    /// Normalizatsiya qilib birlik kvaternionga aylantirish (||q|| = 1)
+    pub fn normalize(&self) -> Self {
+        let n = self.norm();
+        assert!(n > 0.0);
+        Self {
+            w: self.w / n,
+            x: self.x / n,
+            y: self.y / n,
+            z: self.z / n,
+        }
+    }
+
     /// Qo'shma kvaternion: q* = w - xi - yj - zk
     pub fn conjugate(&self) -> Self {
         Self {
@@ -281,10 +298,11 @@ impl Quaternion {
         }
     }
 
-    /// 3D vektorni burish: p' = q * p * q*
+    /// 3D vektorni burish: p' = q * p * q* (faqat birlik kvaternionlar uchun)
     pub fn rotate_vector(&self, v: Vec3) -> Vec3 {
+        let q_norm = self.normalize();
         let p = Quaternion::new(0.0, v.x, v.y, v.z);
-        let p_prime = (*self) * p * self.conjugate();
+        let p_prime = q_norm * p * q_norm.conjugate();
         Vec3::new(p_prime.x, p_prime.y, p_prime.z)
     }
 }
@@ -318,8 +336,11 @@ fn main() {
     assert!((v_rotated.y - 1.0).abs() < 1e-5);
     assert!((v_rotated.z - 0.0).abs() < 1e-5);
 
+    assert!((q.norm() - 1.0).abs() < 1e-5);
+
     // Ikki marta 90 gradus burish (jami 180 gradus): (-1, 0, 0)
     let q180 = q * q;
+    assert!((q180.norm() - 1.0).abs() < 1e-5);
     let v_180 = q180.rotate_vector(v);
     assert!((v_180.x - (-1.0)).abs() < 1e-5);
     assert!((v_180.y - 0.0).abs() < 1e-5);

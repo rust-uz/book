@@ -44,6 +44,30 @@ Ixtiyoriy $n \in \mathbb{N}$ va $\gcd(a, n) = 1$ uchun:
 $$a^{\varphi(n)} \equiv 1 \pmod n$$
 Ushbu teorema Kichik Fermat teoremasining ixtiyoriy $n$ soni uchun umumlashtirilgan ko'rinishidir.
 
+#### Katta Tub Sonlar va Ularning Taqsimoti:
+Ochiq kalitli shifrlashda (RSA, ECC, Diffie-Hellman) xavfsizlik 1024, 2048 yoki 4096 bitli ulkan tub sonlarni generatsiya qilishga asoslanadi.
+
+1. **Tub Sonlar Taqsimoti Teoremasi (Prime Number Theorem):**
+   $x$ gacha bo'lgan tub sonlar soni $\pi(x)$ asimptotik ravishda:
+   $$\pi(x) \sim \frac{x}{\ln x}$$
+   Demak, $x$ atrofidagi tasodifiy toq sonning tub bo'lish ehtimoli taxminan $\frac{2}{\ln x}$ ga teng. Masalan, 2048-bitli sonlar oralig'ida ($\ln(2^{2048}) \approx 1419.5$) har 710 ta toq sondan bittasi tub sondir! Bu shuni anglatadiki, tasodifiy toq son olib, uni tublikka tekshirish orqali bir necha yuzta urinishda katta tub son topish kafolatlanadi.
+
+2. **Tublikni Tekshirish (Primality Testing):**
+   Ulkan sonlarni bo'lib ko'rish (Trial Division, $O(\sqrt{n})$) amalda imkonsiz. Shu sababli ehtimollik algoritmlari qo'llaniladi:
+
+   - **Fermat Tublik Testi va Karmaykl Sonlari (Carmichael Numbers):**
+     Kichik Fermat teoremasiga ko'ra, agar $a^{n-1} \not\equiv 1 \pmod n$ bo'lsa, $n$ aniq murakkab son. Biroq aksincha xulosa har doim to'g'ri emas! Ba'zi murakkab sonlar mavjudki (masalan, $561 = 3 \times 11 \times 17$, $1105$, $1729$), ular barcha $\gcd(a, n) = 1$ asoslar uchun Fermat tengligini qanoatlantiradi. Bular **Karmaykl sonlari** deb ataladi va Fermat testini alday oladi.
+
+   - **Miller-Rabin Algoritmi (Matematik Isboti):**
+     Ushbu zaiflikni yengish uchun algebraik lemmaga tayanamiz: agar $p$ tub son bo'lsa, $x^2 \equiv 1 \pmod p$ tenglama faqat ikkita trivial yechimga ega: $x \equiv 1$ yoki $x \equiv -1 \pmod p$. Agar biror sonning $1$ ga teng kvadratida oraliq ildiz $\pm 1$ bo'lmasa, son murakkabdir!
+
+     $n - 1$ juft sonini $n - 1 = 2^s \cdot d$ ko'rinishida yozamiz ($d$ toq).
+     Ixtiyoriy $a$ asosi uchun quyidagi shartlardan kamida biri bajarilishi shart:
+     1. $a^d \equiv 1 \pmod n$
+     2. Biror $0 \le r < s$ uchun $a^{2^r d} \equiv n - 1 \equiv -1 \pmod n$
+
+     Agar ikkala shart ham bajarilmasa, $n$ qat'iy **murakkab son** (composite) hisoblanadi. $k$ ta mustaqil tasodifiy asoslar bilan tekshirilganda, murakkab sonning testdan o'tib ketish ehtimoli $\le 4^{-k}$ bo'ladi. Masalan, $k = 40$ bo'lganda xato ehtimoli $2^{-80} < 10^{-24}$ bo'lib, amalda mutlaq aniqlikni kafolatlaydi.
+
 #### Kriptografik Qo'llanilishi (RSA Shifrlash):
 Kalitlar generatsiyasi:
 1. Ikkita katta tub son $p$ va $q$ tanlanadi. $n = p \cdot q$, $\varphi(n) = (p-1)(q-1)$.
@@ -65,13 +89,13 @@ Kriptografiyada dasturning nafaqat natijasi, balki u qancha vaqt ishlashi ham ma
 Agar `if (bit == 1) { multiply }` kabi tarmoqlanish yozilsa, CPU ning Branch Predictor apparati va instruction cache o'rtasidagi farq xakerga maxfiy kalit bitlarini mikrosoniyalarda aniqlashga yo'l ochadi!
 
 #### Xotirani Tozalash (Zeroize):
-Operativ xotira (Stack va Heap) xavfsizligi: o'zgaruvchi o'z ko'lamidan (scope) chiqib ketganda (`drop`), Rust xotirani qaytaradi, lekin undagi baytlarni avtomatik tozamaydi. Maxfiy kalitlar xotirada qolib ketsa, "Heartbleed" kabi xurujlar ularni o'qib olishi mumkin.
+Operativ xotira (Stack va Heap) xavfsizligi: o'zgaruvchi o'z ko'lamidan (scope) chiqib ketganda (`drop`), Rust xotirani qaytaradi, lekin undagi baytlarni avtomatik tozalamaydi. Maxfiy kalitlar xotirada qolib ketsa, "Heartbleed" kabi xurujlar ularni o'qib olishi mumkin.
 Kompilyator optimizatsiyasi ham ayyor: agar siz shunchaki massivga nol yozsangiz, kompilyator *"Bu o'zgaruvchi boshqa ishlatilmaydi"* deb, yozish amalini Dead Store Elimination orqali o'chirib yuboradi!
 Shuning uchun kriptografik dasturlarda `volatile` yoki `compiler_fence` orqali tozalash kafolatlanishi shart.
 
 ### 1.4. Amaliy Kod
 
-Quyidagi dastur modulli darajaga ko'tarish, Kengaytirilgan Evklid algoritmi (Extended GCD) va modulli teskari sonni hisoblaydi:
+Quyidagi dastur modulli darajaga ko'tarish, Kengaytirilgan Evklid algoritmi (Extended GCD), modulli teskari sonni hisoblash hamda Miller-Rabin tublik testini to'liq amalga oshiradi:
 
 ```rust
 /// Kengaytirilgan Evklid algoritmi: ax + by = gcd(a, b)
@@ -116,6 +140,56 @@ pub fn mod_exp(mut base: u64, mut exp: u64, modulus: u64) -> u64 {
     result
 }
 
+/// Miller-Rabin deterministik tublik testi (u64 chegarasida kichik asoslar bilan)
+pub fn is_prime_miller_rabin(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    if n == 2 || n == 3 {
+        return true;
+    }
+    if n % 2 == 0 {
+        return false;
+    }
+
+    // n - 1 = 2^s * d (d toq)
+    let mut d = n - 1;
+    let mut s = 0;
+    while d % 2 == 0 {
+        d /= 2;
+        s += 1;
+    }
+
+    // 2^64 gacha bo'lgan barcha sonlar uchun yetarli deterministik asoslar:
+    let test_bases: &[u64] = &[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+
+    for &a in test_bases {
+        if n <= a {
+            break;
+        }
+
+        let mut x = mod_exp(a, d, n);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+
+        let mut composite = true;
+        for _ in 1..s {
+            x = ((x as u128 * x as u128) % n as u128) as u64;
+            if x == n - 1 {
+                composite = false;
+                break;
+            }
+        }
+
+        if composite {
+            return false; // Aniq murakkab son
+        }
+    }
+
+    true // Tub son
+}
+
 fn main() {
     // Kichik Fermat teoremasini tekshiramiz: a^(p-1) = 1 (mod p)
     // p = 17 (tub son), a = 5
@@ -130,6 +204,15 @@ fn main() {
     let inv = mod_inverse(3, 11).expect("Teskari element mavjud");
     assert_eq!(inv, 4); // Chunki 3 * 4 = 12 = 1 (mod 11)
     assert_eq!((3 * inv) % 11, 1);
+
+    // Tub sonlarni tekshirish (Miller-Rabin testi)
+    assert!(is_prime_miller_rabin(17));
+    assert!(is_prime_miller_rabin(104_729)); // 10,000-tub son
+    assert!(!is_prime_miller_rabin(100));
+
+    // Karmaykl soni (Carmichael number): 561 = 3 * 11 * 17
+    // Fermat testini aldaydi, lekin Miller-Rabin uni to'g'ri murakkab deb topadi!
+    assert!(!is_prime_miller_rabin(561));
 }
 ```
 

@@ -191,14 +191,45 @@ fn main() {
 
 ---
 
-## 2. Graflar Nazariyasi: DAG, Topological Sort va Rust Borrow-Checkerda Xotira Xavfsizligi
+## 2. Graflar Nazariyasi: Matritsa va Ro‘yxat orqali ifodalash, DAG, Topological Sort va Rust Borrow-Checker
 
-Graf — $G = (V, E)$ juftligi bo'lib, $V$ cho'qqilar (vertices) va $E$ qirralar (edges) to'plamidir. Amaliy dasturlashda vazifalarni rejalashtirish (task scheduling), kompilyatordagi dependensiyalar graflari va paket menejerlari (Cargo, npm) **DAG** (Directed Acyclic Graph — Yo'naltirilgan Asiklik Graf) tuzilmasiga tayanadi.
+Graf — $G = (V, E)$ juftligi bo'lib, $V$ cho'qqilar (vertices) va $E$ qirralar (edges) to'plamidir. Amaliy tizimli dasturlashda vazifalarni rejalashtirish (task scheduling), kompilyatordagi bog'liqliklar graflari va paket menejerlari (Cargo, npm) graflar nazariyasiga va xususan **DAG** (Directed Acyclic Graph — Yo'naltirilgan Asiklik Graf) tuzilmasiga tayanadi.
 
-### 2.1. Matematik Isbot: DAG va Topological Sort
+### 2.1. Matritsa va Ro‘yxat orqali Ifodalash: Matematik Ta'rif va Asimptotik Tahlil
+
+Grafni kompyuter xotirasida ifodalashning ikkita asosiy klassik usuli mavjud: **Qo'shnilik Matritsasi (Adjacency Matrix)** va **Qo'shnilik Ro'yxati (Adjacency List)**.
+
+#### 1. Qo'shnilik Matritsasi (Adjacency Matrix)
+Graf $|V| \times |V|$ o'lchamli $A$ ikkilik matritsasi bilan ifodalanadi:
+$$A[u][v] = \begin{cases} 1, & \text{agar } (u, v) \in E \text{ bo'lsa} \\ 0, & \text{aks holda} \end{cases}$$
+
+- **Xotira sarfi:** Qat'iy $\Theta(|V|^2)$. Qirralar soni $|E|$ dan qat'i nazar doim kvadratik hajm oladi.
+- **Qirra mavjudligini tekshirish ($(u, v) \in E$):** $O(1)$ konstanta vaqt.
+- **Cho'qqining barcha qo'shnilarini topish:** $O(|V|)$ vaqt (butun qatorni tekshirib chiqish kerak).
+- **Qachon qo'llaniladi:** Zich graflar (Dense Graphs, $|E| \approx |V|^2$), barcha juftliklar orasidagi eng qisqa yo'lni topish (Floyd-Warshall algoritmi) va grafik protsessorlar (GPU) yordamidagi parallel matritsaviy hisob-kitoblarda.
+
+#### 2. Qo'shnilik Ro'yxati (Adjacency List)
+Har bir $u \in V$ cho'qqi uchun undan chiquvchi qirralar ro'yxati saqlanadi:
+$$\text{Adj}[u] = \{v \in V \mid (u, v) \in E\}$$
+
+- **Xotira sarfi:** $\Theta(|V| + |E|)$.
+- **Qirra mavjudligini tekshirish ($(u, v) \in E$):** $O(\deg(u))$ vaqt.
+- **Cho'qqining barcha qo'shnilarini topish:** $O(\deg(u))$ vaqt.
+- **Qachon qo'llaniladi:** Siyrak graflar (Sparse Graphs, $|E| \ll |V|^2$). Real dasturlashdagi deyarli barcha tizimli masalalar (paket dependensiyalari, veb sahifalar tarmog'i, AST sintaktik daraxtlari) siyrak graflardir.
+
+#### Asimptotik Taqqoslash Jadvali:
+| Amal | Qo'shnilik Matritsasi | Qo'shnilik Ro'yxati |
+| :--- | :--- | :--- |
+| **Xotira murakkabligi** | $\Theta(|V|^2)$ | $\Theta(|V| + |E|)$ |
+| **Qirra borligini tekshirish ($u \to v$)** | $O(1)$ | $O(\deg(u))$ |
+| **Qo'shnilarni aylanib chiqish** | $O(|V|)$ | $O(\deg(u))$ |
+| **Yangi qirra qo'shish** | $O(1)$ | $O(1)$ |
+| **Qirrani o'chirish** | $O(1)$ | $O(\deg(u))$ |
+
+### 2.2. Matematik Isbot: DAG va Topological Sort
 
 #### Ta'rif:
-Graf cho'qqilarining **Topologik tartibi** (Topological Sort) deb cho'qqilarning shunday chiziqli ketma-ketligi $\langle v_1, v_2, \dots, v_n \rangle$ ga aytiladiki, grafordagi har bir $(u, v) \in E$ yo'naltirilgan qirra uchun $u$ har doim $v$ dan oldin joylashadi.
+Graf cho'qqilarining **Topologik tartibi** (Topological Sort) deb cho'qqilarning shunday chiziqli ketma-ketligi $\langle v_1, v_2, \dots, v_n \rangle$ ga aytiladiki, grafdagi har bir $(u, v) \in E$ yo'naltirilgan qirra uchun $u$ har doim $v$ dan oldin joylashadi.
 
 #### Fundamental Teorema:
 Yo'naltirilgan $G$ grafida topologik tartib mavjud bo'lishi uchun $G$ da hech qanday yo'naltirilgan tsikl bo'lmasligi (ya'ni graf DAG bo'lishi) **zarur va yetarli**.
@@ -222,14 +253,14 @@ Yo'naltirilgan $G$ grafida topologik tartib mavjud bo'lishi uchun $G$ da hech qa
 4. Bu jarayon barcha cho'qqilar tugaguncha takrorlanadi.
 Agar barcha $|V|$ ta cho'qqi ro'yxatga kirmasdan jarayon to'xtab qolsa, qolgan qism grafda tsikl mavjud!
 
-### 2.2. Rust Xotira Modeli: Nega Ko'rsatkichlar Graflarda Xavfli?
+### 2.3. Rust Xotira Modeli: Nega Ko'rsatkichlar Graflarda Xavfli?
 
 C++ yoki Java dasturchilari graflarni ko'pincha tugunlarning o'zaro ko'rsatkichlari bilan qurishga o'rgangan:
 ```text
 Tugun A  <=======>  Tugun B
 ```
 Rust tilida buni `Rc<RefCell<Node>>` bilan amalga oshirishga urinish falokatga olib keladi:
-1. **Reference Cycles & Memory Leaks:** Agar grafda ikki tomonlama yoki aylanma bog'liqlik bo'lsa, `Rc` hisoblagichi (reference count) hech qachon nolga tushmaydi. Natijada xotira to tozalanmay oqib ketadi (Memory Leak).
+1. **Reference Cycles & Memory Leaks:** Agar grafda ikki tomonlama yoki aylanma bog'liqlik bo'lsa, `Rc` hisoblagichi (reference count) hech qachon nolga tushmaydi. Natijada xotira tozalanmay oqib ketadi (Memory Leak).
 2. **Borrow-Checker Ziddiyati:** Rustning *"Yoki bitta o'zgaruvchan (mutable), yoki ko'plab o'zgarmas (immutable) havola"* qoidasi murakkab to'rli graflarda runtime check (`RefCell`) va dinamik vahimalarga (`borrow_mut() panics`) sabab bo'ladi.
 3. **Kesh Fragmentatsiyasi:** Har bir tugun heapning turli burchaklarida allokatsiya qilinadi, bu esa protsessor keshining yuzlab takt kesh-misslarga uchrashiga sabab bo'ladi.
 
@@ -248,13 +279,43 @@ Afzalliklari:
 - Borrow-checker bilan zarracha muammo tug'dirmaydi.
 - Graf o'chirilganda butun graf bitta yo'la xotiradan tozalanadi ($O(1)$ deallocation).
 
-### 2.3. Amaliy Kod
+### 2.4. Amaliy Kod
 
-Quyida indekslarga asoslangan va Kahn algoritmi orqali topologik tartiblash hamda tsikllarni aniqlovchi to'liq Rust kodi keltirilgan:
+Quyida ikkala ifodalash shakli — **AdjacencyMatrix** va indekslarga asoslangan **AdjacencyList (DiGraph)** hamda Kahn algoritmi orqali topologik tartiblash va tsikllarni aniqlovchi to'liq Rust kodi keltirilgan:
 
 ```rust
 use std::collections::VecDeque;
 
+/// 1. Qo'shnilik Matritsasi orqali ifodalash (Adjacency Matrix)
+/// Qirra mavjudligini O(1) da tekshirish uchun ideal.
+pub struct GraphMatrix {
+    nodes_count: usize,
+    matrix: Vec<bool>, // Qatorlar bo'yicha tekis (flat) 1D xotira: i * n + j
+}
+
+impl GraphMatrix {
+    pub fn new(nodes_count: usize) -> Self {
+        Self {
+            nodes_count,
+            matrix: vec![false; nodes_count * nodes_count],
+        }
+    }
+
+    pub fn add_edge(&mut self, from: usize, to: usize) {
+        assert!(from < self.nodes_count && to < self.nodes_count);
+        self.matrix[from * self.nodes_count + to] = true;
+    }
+
+    pub fn has_edge(&self, from: usize, to: usize) -> bool {
+        if from >= self.nodes_count || to >= self.nodes_count {
+            return false;
+        }
+        self.matrix[from * self.nodes_count + to]
+    }
+}
+
+/// 2. Qo'shnilik Ro'yxati orqali ifodalash (Adjacency List)
+/// Siyrak graflar va Topologik saralash uchun xotirada samarali.
 #[derive(Debug)]
 pub struct DiGraph {
     nodes_count: usize,
@@ -312,6 +373,15 @@ impl DiGraph {
 }
 
 fn main() {
+    // A. Qo'shnilik Matritsasini tekshirish
+    let mut matrix_g = GraphMatrix::new(4);
+    matrix_g.add_edge(0, 1);
+    matrix_g.add_edge(1, 2);
+    assert!(matrix_g.has_edge(0, 1));
+    assert!(matrix_g.has_edge(1, 2));
+    assert!(!matrix_g.has_edge(0, 2)); // Bevosita qirra yo'q
+
+    // B. Qo'shnilik Ro'yxati va Kahn algoritmi
     // 6 ta vazifadan iborat loyiha dependensiyalari grafigi:
     // 5 -> 2, 5 -> 0, 4 -> 0, 4 -> 1, 2 -> 3, 3 -> 1
     let mut g = DiGraph::new(6);
