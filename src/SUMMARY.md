@@ -39,6 +39,14 @@
 - [19. Ilg‘or Xususiyatlar: Unsafe, FFI va Makroslar](ch19-00-advanced-features.md)
 - [20. Yakuniy Loyiha: Ko‘p Oqimli Veb Server Qurish](ch20-00-final-project-a-multithreaded-web-server.md)
 
+# Tizimli Matematika va Kriptografiya
+
+- [1-Modul: Protsessor Arifmetikasi va Ikkilik Mantiq](math-01-bitwise.md)
+- [2-Modul: Haqiqiy Sonlar va Hisoblash Xatoliklari](math-02-floating-point.md)
+- [3-Modul: Diskret Matematika va Algoritmik Tahlil](math-03-discrete.md)
+- [4-Modul: Kriptografik Matematika](math-04-cryptography.md)
+- [5-Modul: Chiziqli Algebra va Vektorlar Fazosi](math-05-linear-algebra.md)
+
 ---
 
 [Ilova A: Kalit So‘zlar](appendix-01-keywords.md)
