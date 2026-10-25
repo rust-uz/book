@@ -5,10 +5,15 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
-    name: Build & Verify Uzbek Rust Book
+    name: Build, Verify & Deploy Uzbek Rust Book
     runs-on: ubuntu-latest
 
     steps:
@@ -30,3 +35,35 @@ jobs:
           test -f book/robots.txt || (echo "robots.txt missing" && exit 1)
           test -f book/sitemap.xml || (echo "sitemap.xml missing" && exit 1)
           echo "Build and SEO verification succeeded!"
+
+      - name: Deploy to VPS (doc.ferris.uz)
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST || '5.175.171.161' }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER || 'root' }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/var/www/doc.ferris.uz/' }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error::DEPLOY_SSH_KEY secret is not configured in GitHub Secrets! Please add your private SSH key to repository secrets (Settings -> Secrets and variables -> Actions)."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+
+          printf "%s\n" "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # Add remote server host key to known_hosts to prevent MITM attacks
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 644 ~/.ssh/known_hosts
+
+          echo "Starting rsync deployment to ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}..."
+          rsync -avz --delete --chmod=D755,F644 \
+            -e "ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT -o StrictHostKeyChecking=accept-new" \
+            book/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}"
+
+          echo "Deployment to ${DEPLOY_HOST}:${DEPLOY_PATH} completed successfully!"
