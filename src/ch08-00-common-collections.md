@@ -152,6 +152,7 @@ fn main() {
 `entry` API si orqali kalit mavjudligini tekshirib, agar mavjud bo‘lmasa yangi qiymat kiritish juda qulay:
 
 ```rust
+# use std::collections::HashMap;
 let mut ballar = HashMap::new();
 ballar.insert(String::from("Moviy"), 10);
 

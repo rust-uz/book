@@ -74,7 +74,7 @@ Rust da **barcha narsalar (funksiyalar, metodlar, strukturalar, modullar) odatiy
    `front_of_house::hosting::add_to_waitlist();`
    `super::boshqa_funksiya();`
 
-```rust
+```rust,ignore
 pub fn eat_at_restaurant() {
     // Mutlaq yo'l
     crate::front_of_house::hosting::add_to_waitlist();
@@ -94,7 +94,7 @@ pub fn eat_at_restaurant() {
 
 Har safar uzun yo‘llarni yozmaslik uchun `use` orqali kerakli elementni ko‘rinish sohasiga olib kirish mumkin:
 
-```rust
+```rust,ignore
 use crate::front_of_house::hosting;
 
 pub fn eat_at_restaurant() {
@@ -113,7 +113,7 @@ use std::io::Result as IoResult;
 ### Qayta Eksport Qilish (`pub use`):
 Ichki kod strukturasini yashirgan holda, tashqi foydalanuvchilar uchun qulay API yaratish maqsadida `pub use` ishlatiladi:
 
-```rust
+```rust,ignore
 pub use crate::front_of_house::hosting;
 ```
 
@@ -124,7 +124,7 @@ pub use crate::front_of_house::hosting;
 Loyiha kattalashganda har bir modulni o‘z fayliga chiqarish eng toza usuldir (Rust 2018+ standarti):
 
 **`src/lib.rs`:**
-```rust
+```rust,ignore
 mod front_of_house; // Rust avtomatik front_of_house.rs faylini qidiradi
 
 pub use crate::front_of_house::hosting;
@@ -135,12 +135,12 @@ pub fn eat_at_restaurant() {
 ```
 
 **`src/front_of_house.rs`:**
-```rust
+```rust,ignore
 pub mod hosting; // front_of_house/hosting.rs faylini qidiradi
 ```
 
 **`src/front_of_house/hosting.rs`:**
-```rust
+```rust,ignore
 pub fn add_to_waitlist() {}
 ```
 

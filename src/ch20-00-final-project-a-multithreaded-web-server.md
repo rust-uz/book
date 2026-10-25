@@ -10,7 +10,7 @@ Biz **haqiqiy, ko‘p oqimli HTTP veb-serverini** tashqi freymvorklarsiz, faqatg
 
 Veb-serverlar tarmoqda TCP (Transmission Control Protocol) protokoli orqali ishlaydi. Rust da TCP ulanishlarini qabul qilish uchun `std::net::TcpListener` ishlatiladi:
 
-```rust
+```rust,no_run
 // src/main.rs
 use std::net::TcpListener;
 
@@ -46,7 +46,7 @@ HTTP/1.1 200 OK\r\nContent-Length: <uzunlik>\r\n\r\n<HTML_MATN>
 
 Keling, so‘rovni tahlil qilib, HTML sahifani qaytaruvchi kod yozamiz:
 
-```rust
+```rust,no_run
 use std::fs;
 use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
@@ -88,7 +88,7 @@ Loyihangiz papkasida `hello.html` va `404.html` fayllarini yarating. Endi server
 
 Hozirgi serverimiz **bir oqimli (single-threaded)**. Agar kimdir `/sleep` manziliga kirsa va u 5 soniya vaqt olsa:
 
-```rust
+```rust,ignore
 "GET /sleep HTTP/1.1" => {
     thread::sleep(Duration::from_secs(5));
     ("HTTP/1.1 200 OK", "hello.html")
@@ -211,7 +211,7 @@ impl Worker {
 
 Server to‘xtatilganda barcha davom etayotgan so‘rovlar oxirigacha bajarilishi va oqimlar toza yopilishi lozim. Buning uchun `ThreadPool` ga `Drop` traitini ulaymiz:
 
-```rust
+```rust,ignore
 impl Drop for ThreadPool {
     fn drop(&mut self) {
         // Avval kanal uzatuvchisini o'chiramiz, shunda barcha workerlar Err oladi va tsikldan chiqadi:
@@ -236,7 +236,7 @@ impl Drop for ThreadPool {
 
 Endi `src/main.rs` faylini yangilaymiz:
 
-```rust
+```rust,ignore
 use std::fs;
 use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};

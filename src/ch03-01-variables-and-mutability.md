@@ -8,7 +8,7 @@ Rust tilining eng muhim xususiyatlaridan biri shundaki, barcha o‘zgaruvchilar 
 
 O‘zgaruvchi o‘zgarmas bo‘lsa, unga bir marta qiymat biriktirilgach, uni qayta o‘zgartirib bo‘lmaydi. Quyidagi misolga qarang:
 
-```rust
+```rust,compile_fail
 fn main() {
     let x = 5;
     println!("x ning qiymati: {x}");

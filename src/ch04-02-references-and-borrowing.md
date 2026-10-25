@@ -40,7 +40,7 @@ Funksiya parametr sifatida havolani qabul qilishiga Rust da **Qarz olish (Borrow
 ### Qarz Olingan Narsani O‘zgartirib Bo‘lmaydi!
 Odatiy holatda barcha havolalar o‘zgarmas (immutable) bo‘ladi:
 
-```rust
+```rust,compile_fail
 fn o_zgartir(s: &String) {
     s.push_str(", dunyo"); // XATO: cannot borrow `*s` as mutable
 }
@@ -87,7 +87,7 @@ Agar bitta ma’lumotga bir vaqtning o‘zida ikkita ko‘rsatkich o‘zgartiris
 
 Rust bu xatolikni hali dastur ishga tushmasidanoq, kompilyatsiya jarayonida to‘xtatadi!
 
-```rust
+```rust,compile_fail
 let mut s = String::from("salom");
 
 let r1 = &mut s;
@@ -99,7 +99,7 @@ println!("{r1}, {r2}");
 ### O‘zgarmas va O‘zgaruvchan Havolalarni Aralashtirish
 Xuddi shuningdek, kimdir ma’lumotni o‘qiyotgan paytda boshqa birov uni o‘zgartirib yuborishi mumkin emas:
 
-```rust
+```rust,compile_fail
 let mut s = String::from("salom");
 
 let r1 = &s; // muammo yo'q (o'qish)
@@ -117,7 +117,7 @@ C va C++ kabi tillarda xotiradan o‘chib ketgan o‘zgaruvchining manzilini saq
 
 Rust da kompilyator hech qachon muallaq havola yaratilishiga yo‘l qo‘ymaydi:
 
-```rust
+```rust,compile_fail
 fn main() {
     let havola = muallaq();
 }

@@ -14,7 +14,7 @@ Rust da esa **istisnolar (exceptions) yo‘q!** Buning o‘rniga xatolar ikki to
 
 Dasturda kutilmagan favqulodda holat yuz berganda `panic!` makrosi ishga tushadi:
 
-```rust
+```rust,should_panic
 fn main() {
     panic!("Katta avariya yuz berdi! Tizim to‘xtatildi.");
 }
@@ -81,7 +81,7 @@ Har safar `match` yozish kodni cho‘zib yuborishi mumkin. Sinov yoki prototipla
 - **`.unwrap()`:** Agar natija `Ok` bo‘lsa qiymatni qaytaradi; agar `Err` bo‘lsa, dasturni avtomatik `panic!` qilib to‘xtatadi.
 - **`.expect("Xabar")`:** Xuddi `unwrap` kabi ishlaydi, ammo `panic` bo‘lganda siz yozgan maxsus xabarni ko‘rsatadi. Bu ishlab chiqarish (production) kodida xatoni tez topish uchun tavsiya etiladi.
 
-```rust
+```rust,no_run
 use std::fs::File;
 
 let f = File::open("salom.txt").expect("salom.txt fayli ochilmadi! Iltimos, fayl mavjudligini tekshiring.");

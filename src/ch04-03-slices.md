@@ -118,7 +118,7 @@ Bu yerda `s` ning tipi aslida **`&str`** dir! U dasturning binar kodi (binary ex
 
 ### Eng Yaxshi Amaliyot (Best Practice)
 Funksiyalarga parametr yozayotganda `&String` o‘rniga `&str` dan foydalanish ancha professional yondashuvdir:
-```rust
+```rust,ignore
 fn birinchi_soz(s: &str) -> &str { ... }
 ```
 Chunki bunday funksiyaga ham `String` ning kesmasini (`&my_string[..]`), ham oddiy satr literalini (`"salom"`) birdek uzatish mumkin bo‘ladi.

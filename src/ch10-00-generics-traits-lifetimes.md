@@ -94,6 +94,9 @@ impl Xulosa for Tvitt {
 Funksiyalarga "faqat ushbu traitni bajargan har qanday tip qabul qilinsin" deb shart qo‘yishimiz mumkin:
 
 ```rust
+# pub trait Xulosa {
+#     fn xulosani_ol(&self) -> String;
+# }
 // Oddiy uslub:
 pub fn xabar_ber(element: &impl Xulosa) {
     println!("Yangi xulosa: {}", element.xulosani_ol());
@@ -106,7 +109,7 @@ pub fn xabar_ber_kengaytirilgan<T: Xulosa>(element: &T) {
 ```
 
 Bir nechta trait talab qilish (`+` orqali) va `where` bloklari:
-```rust
+```rust,ignore
 fn murakkab_funksiya<T, U>(t: &T, u: &U) -> i32
 where
     T: Display + Clone,
@@ -156,6 +159,9 @@ fn eng_uzun<'a>(x: &'a str, y: &'a str) -> &'a str {
 Keling, amalda ko‘raylik:
 
 ```rust
+# fn eng_uzun<'a>(x: &'a str, y: &'a str) -> &'a str {
+#     if x.len() > y.len() { x } else { y }
+# }
 fn main() {
     let matn1 = String::from("uzun matn bu yerda");
 

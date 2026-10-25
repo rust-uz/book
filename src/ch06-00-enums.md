@@ -142,6 +142,9 @@ Rust da `match` barcha mumkin bo‘lgan variantlarni ko‘rib chiqishi **shart**
 Qolgan barcha holatlarni bitta qoidada qamrab olish uchun `other` yoki `_` (placeholder) belgisi ishlatiladi:
 
 ```rust
+# fn fancy_hat_ber() {}
+# fn shlyapani_olib_qoy() {}
+# fn qayta_tashla() {}
 let dice_roll = 9;
 match dice_roll {
     3 => fancy_hat_ber(),

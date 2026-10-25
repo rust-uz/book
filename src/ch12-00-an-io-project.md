@@ -11,7 +11,7 @@ Biz klassik GNU vositasi bo‘lgan `grep` (Global Regular Expression Print) ning
 Dastlab `cargo new minigrep` orqali yangi loyiha ochamiz.
 Terminaldan kiritilgan argumentlarni o‘qish uchun `std::env::args()` funksiyasidan foydalanamiz:
 
-```rust
+```rust,no_run
 // src/main.rs
 use std::env;
 
@@ -37,7 +37,7 @@ fn main() {
 
 Fayl ichidagi barcha matnni bitta `String` ga o‘qib olish uchun `std::fs::read_to_string` funksiyasi xizmat qiladi:
 
-```rust
+```rust,no_run
 use std::env;
 use std::fs;
 
@@ -63,7 +63,7 @@ fn main() {
 Keling, konfiguratsiyani saqlovchi `Config` strukturasi va xatolarni chiroyli qaytaruvchi `Config::build` metodini yaratamiz.
 
 ### `src/lib.rs` Fayli:
-```rust
+```rust,ignore
 use std::error::Error;
 use std::fs;
 
@@ -179,7 +179,7 @@ Trust me.";
 
 `src/main.rs` faylimizni toza va nafis qilib bog‘laymiz:
 
-```rust
+```rust,ignore
 // src/main.rs
 use std::env;
 use std::process;

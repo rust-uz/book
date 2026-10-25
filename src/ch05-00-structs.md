@@ -40,6 +40,12 @@ fn main() {
 Agar o‘zgaruvchi nomi bilan struktura maydonining nomi bir xil bo‘lsa, uni qisqartirib yozish mumkin:
 
 ```rust
+# struct Foydalanuvchi {
+#     faol: bool,
+#     foydalanuvchi_nomi: String,
+#     email: String,
+#     kirishlar_soni: u64,
+# }
 fn foydalanuvchi_yarat(email: String, foydalanuvchi_nomi: String) -> Foydalanuvchi {
     Foydalanuvchi {
         faol: true,
@@ -54,6 +60,18 @@ fn foydalanuvchi_yarat(email: String, foydalanuvchi_nomi: String) -> Foydalanuvc
 Mavjud struktura asosida yangi nusxa yaratish va faqat ma’lum maydonlarni o‘zgartirish uchun `..` sintaksisidan foydalaniladi:
 
 ```rust
+# struct Foydalanuvchi {
+#     faol: bool,
+#     foydalanuvchi_nomi: String,
+#     email: String,
+#     kirishlar_soni: u64,
+# }
+# let foydalanuvchi1 = Foydalanuvchi {
+#     faol: true,
+#     foydalanuvchi_nomi: String::from("ali"),
+#     email: String::from("ali@example.com"),
+#     kirishlar_soni: 1,
+# };
 let foydalanuvchi2 = Foydalanuvchi {
     email: String::from("boshqa@example.com"),
     ..foydalanuvchi1 // Qolgan barcha maydonlar foydalanuvchi1 dan ko'chiriladi

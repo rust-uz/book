@@ -16,6 +16,7 @@ Andazalar nafaqat `match` iboralarida, balki Rust tilining deyarli barcha qismla
 
 ### A. `match` Shoxobchalarida
 ```rust
+# let qiymat = 1;
 match qiymat {
     1 => println!("Bir"),
     2 | 3 => println!("Ikki yoki Uch"),

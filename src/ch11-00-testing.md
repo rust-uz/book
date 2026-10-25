@@ -42,6 +42,7 @@ cargo test
 - **`assert_ne!(chap, ong)`:** Ikki qiymat teng emasligini tekshiradi (`!=`).
 - **Maxsus xato xabarlari:** Har bir makrosga qo‘shimcha formatlangan xabar berish mumkin:
   ```rust
+  # let natija = 5;
   assert!(natija > 0, "Qiymat musbat bo‘lishi kerak edi, lekin {natija} olindi!");
   ```
 
@@ -122,7 +123,9 @@ Cargo testlarni ishga tushirish uchun juda ko‘p qulay bayroqlarga (flags) ega:
   ```rust
   #[test]
   #[ignore]
-  fn sekin_ishlovchi_katta_test() { ... }
+  fn sekin_ishlovchi_katta_test() {
+      // Sekin ishlovchi kod...
+  }
   ```
   Faqat `ignore` qilingan testlarni ishga tushirish uchun:
   ```bash

@@ -87,7 +87,7 @@ Stack                      Heap
 ```
 
 ### Foydalanuvchidan Matn O‘qish
-```rust
+```rust,ignore
 io::stdin()
     .read_line(&mut guess)
     .expect("Satrni o‘qib bo‘lmadi!");
@@ -116,7 +116,7 @@ rand = "0.8.5"
 
 Endi `src/main.rs` faylimizni yangilaymiz:
 
-```rust
+```rust,ignore
 use std::io;
 use rand::Rng;
 
@@ -147,7 +147,7 @@ fn main() {
 
 Endi foydalanuvchi kiritgan son bilan sirli sonni solishtirishimiz lozim. Buning uchun Rust ning kuchli vositasi — **`match`** va `std::cmp::Ordering` dan foydalanamiz.
 
-```rust
+```rust,ignore
 use std::cmp::Ordering;
 use std::io;
 use rand::Rng;
@@ -180,7 +180,7 @@ fn main() {
 
 ### O‘zgaruvchini Soyalash (Shadowing)
 E’tibor bering, bizda avval `guess` nomli `String` o‘zgaruvchi bor edi. Keyin esa:
-```rust
+```rust,ignore
 let guess: u32 = guess.trim().parse().expect(...);
 ```
 orqali yana `guess` nomli yangi o‘zgaruvchi yaratdik. Rust bu jarayonga **Shadowing** (soyalash) deb ataydi. Bu o‘zgaruvchilar nomini `guess_str` yoki `guess_num` deb ko‘paytirmasdan, bir xil mantiqiy nomni qayta ishlatish imkonini beradi.
@@ -195,7 +195,7 @@ O‘yin bir martagina so‘rab to‘xtab qolmasligi, to foydalanuvchi to‘g‘r
 
 Mana to‘liq va yakuniy kodimiz:
 
-```rust
+```rust,ignore
 use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
